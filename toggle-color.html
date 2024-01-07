@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Toggle Color</title>
+    <style>
+      #box {
+        width: 100px;
+        height: 100px;
+        background-color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="box"></div>
+    <script type="text/javascript">
+      /*
+        Изменения ДОМа не применяются, пока яваскрипт не закончит выполнение.      
+      */
+      console.log("set timeout");
+      setTimeout(doStuff, 2000);
+
+      function doStuff() {
+        console.log("timeout is due. start doing stuff");
+        console.log("notice thr green box");
+
+        const boxElem = document.getElementById('box');
+        boxElem.style.backgroundColor = 'red';
+
+        console.log("change box color to red");
+        console.log("notice that box is still green");
+    
+        console.log("let's loop for 5 sec");
+        loop(5000);
+        console.log("loop is over");
+
+        console.log("end doing stuff. about to exit javascript");
+      }
+
+      function loop(ms) {
+        const startTime = (new Date()).getTime();
+        let currTime = startTime;
+        do {
+            currTime = (new Date()).getTime();
+        } while (currTime - startTime < ms);
+      }
+    </script>
+  </body>
+</html>

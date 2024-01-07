@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Toggle Color</title>
+    <style>
+      #input {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <input id="input" type="text" value="bear"/>
+    <script type="text/javascript">
+       /*
+        1. Изменения ДОМа не применяются, пока яваскрипт не закончит выполнение.
+        2. Пока яваскрипт занимает тред страницы, ввод юзера не отображается немедленно,
+           а добпвляется в очередь и применяется после того как яваскрипт разблокирует тред.
+           Значит есть второй параллельный тред, который знает, что юзер выбрал элемент ввода
+           и что-то ввёл в него.
+      */
+      console.log("set timeout");
+      setTimeout(doStuff, 2000);
+
+      function doStuff() {
+        console.log("timeout is due. start doing stuff");
+        const boxElem = document.getElementById('input');
+        boxElem.value = 'deer';
+        console.log("change input value to `deer`");
+        console.log("notice that input value is still `bear`");
+    
+        console.log("let's loop for 9 sec");
+        console.log("may try to input something");
+        const startTime = (new Date()).getTime();    
+        let currTime = startTime;
+        do {
+            currTime = (new Date()).getTime();
+        } while (currTime - startTime < 9000);
+        console.log("loop is over");
+
+        console.log("end doing stuff. about to exit javascript");
+      }
+    </script>
+  </body>
+</html>
