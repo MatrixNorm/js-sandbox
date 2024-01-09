@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>№1</title>
+</head>
+
+<body>
+  <script type="text/javascript">
+    function timeout(ms) {
+      return new Promise(ok => setTimeout(() => {
+        // xyz
+        ok()
+      }, ms));
+    }
+
+    async function* intervalProducer(ms) {
+      let i = 1;
+      yield "start producing"
+      while (i < 4) {
+        console.log("A:", i)
+        let pr = timeout(ms * i)
+        pr.then((x) => {
+          console.log(x, pr)
+        })
+        // на этом await генератор возвращает потребителю промис Z, который 
+        // будет обёрткой вокруг промиса pr. Когда разрешится pr, генератор
+        // возобновит своё выполение начиная с инструкции после await pr и,
+        // когда дойдёт до yield Value, приостановится. Сразу же будет разрешён
+        // промис Z значением Value. После этого потребитель волен опять
+        // вызывать метод next() генератора.
+        await pr
+        console.log("B:", i)
+        yield Date.now()
+        i++;
+      }
+    }
+
+    async function forAwaitLoopConsumer() {
+      console.log("start looping")
+      for await (let time of intervalProducer(2000)) {
+        console.log(time)
+      }
+      console.log("finish looping")
+    }
+
+    async function whileLoopConsumer() {
+      setTimeout(() => {
+        console.log("hi setTimeout")
+      }, 0)
+      queueMicrotask(() => {
+        console.log("hi microtask")
+      })
+      producer = intervalProducer(2000)
+      console.log("start looping")
+      do {
+        prom = producer.next()
+        prom.then((x) => {
+          console.log(x)
+        })
+        window.__prom = prom
+        console.log(prom)
+        result = await prom
+        console.log(result.value)
+      } while (!result.done)
+      console.log("finish looping")
+    }
+
+    function plainPromisesConsumer() {
+      producer = intervalProducer(2000)
+      step()
+
+      function step() {
+        prom = producer.next()
+        prom.then(result => {
+          if (!result.done) {
+            step()
+          }
+        })
+      }
+    }
+  </script>
+</body>
+
+</html>
