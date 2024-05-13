@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>№1</title>
+</head>
+
+<body>
+  <script type="text/javascript">
+    (function () {
+      const log = console.log
+      const p = Promise.resolve("Joe");
+
+      log("Brandon")
+      p.then(() => log("Donny"))
+      log("Kushner")
+    })();
+  </script>
+</body>
+
+</html>

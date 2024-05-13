@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello World</title>
+</head>
+
+<body>
+  <div>
+    <input id="input1" />
+    <input id="input2" />
+  </div>
+  <script type="text/javascript">
+    (function () {
+      const inputEl = document.getElementById('input1');
+
+      inputEl.addEventListener("input", (evt) => {
+        const val = evt.target.value;
+        inputEl.value = val.toUpperCase();
+      });
+    })();
+
+    (function () {
+      const inputEl = document.getElementById('input2');
+
+      inputEl.addEventListener("input", (evt) => {
+        const caretPositionBefore = evt.target.selectionStart;
+        const val = evt.target.value;
+        inputEl.value = val.toUpperCase();
+        inputEl.setSelectionRange(caretPositionBefore, caretPositionBefore);
+      });
+    })();
+  </script>
+</body>
+
+</html>

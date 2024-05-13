@@ -13,13 +13,13 @@
   <script type="text/javascript">
     const inputEl = document.getElementById('input');
 
-    function setInput() {
-      let val = inputEl.value;
-      inputEl.value = "$" + val;
-      setTimeout(setInput, 2000);
-    }
+    inputEl.addEventListener("input", (evt) => {
+      const val = evt.target.value;
+      requestAnimationFrame(() => {
+        inputEl.value = val.toUpperCase();
+      })
+    })
 
-    setInput();
   </script>
 </body>
 
