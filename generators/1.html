@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>№1</title>
+</head>
+
+<body>
+  <script type="text/javascript">
+    log = console.log
+
+    function case1() {
+      function* gen() {
+        log("A")
+        let x = yield* subGen()
+        log("B", x)
+      }
+
+      function* subGen() {
+        log("bear")
+        yield 1
+        log("moose")
+        yield 2
+        return 3.14
+      }
+
+      G = gen()
+      for (let x of G) {
+        log(x)
+      }
+    }
+
+    function case2() {
+      function* gen() {
+        log("A")
+        let x = yield* subGen()
+        log("B", x)
+      }
+
+      function* subGen() {
+        log("bear")
+        yield 1
+        log("moose")
+        yield 2
+        return 3.14
+      }
+
+      G = gen()
+      for (let x of G) {
+        log(x)
+      }
+    }
+  </script>
+</body>
+
+</html>

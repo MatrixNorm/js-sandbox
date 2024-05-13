@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello World</title>
+</head>
+
+<body>
+  <div>
+    <input id="input" />
+  </div>
+  <script type="text/javascript">
+    const inputEl = document.getElementById('input');
+
+    function setInput() {
+      let val = inputEl.value;
+      inputEl.value = "$" + val;
+      setTimeout(setInput, 2000);
+    }
+
+    setInput();
+  </script>
+</body>
+
+</html>

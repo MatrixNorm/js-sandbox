@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello World</title>
+  <script src="/lib/react18.2.0.development.js"></script>
+  <script src="/lib/react-dom18.2.0.development.js"></script>
+  <script src="/lib/babel-standalone6.26.0.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+
+    let appState = { name: "Brandon" };
+
+    function updateState(newState) {
+      appState = newState;
+      requestAnimationFrame(render);
+    }
+
+    function render() {
+      root.render(<MyApp name={appState.name} />);
+    }
+
+    function MyApp(props) {
+
+      React.useEffect(() => {
+        console.log('mounted');
+
+        return () => {
+          console.log('unmounted')
+        }
+      }, []);
+
+      return (<div>
+        <label>Name</label>
+        <input value={props.name}
+          onChange={(evt) => {
+            updateState({ ...appState, name: evt.target.value })
+          }} />
+      </div>);
+    }
+
+    render();
+
+  </script>
+</body>
+
+</html>
