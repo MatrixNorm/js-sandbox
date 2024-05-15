@@ -8,7 +8,11 @@
 
 <body>
   <div>
+    <label>without setSelectionRange</label>
     <input id="input1" />
+  </div>
+  <div>
+    <label>with setSelectionRange</label>
     <input id="input2" />
   </div>
   <script type="text/javascript">
@@ -16,8 +20,22 @@
       const inputEl = document.getElementById('input1');
 
       inputEl.addEventListener("input", (evt) => {
+        console.log("Donny", evt.target.value, evt.target.selectionStart)
+        alert(evt.target.value) // alert реально блокирует поток страницы
+                                // Это в отличии от брейкпоинтах в девтулз.
         const val = evt.target.value;
-        inputEl.value = val.toUpperCase();
+        evt.target.value = val.toUpperCase();
+        console.log("Kushner", evt.target.value, evt.target.selectionStart)
+        alert(evt.target.value)
+        requestAnimationFrame(() => {
+          console.log("Joe")
+          alert(evt.target.value)
+
+          requestAnimationFrame(() => {
+            console.log("Brandon")
+            alert(evt.target.value)
+          })
+        })
       });
     })();
 

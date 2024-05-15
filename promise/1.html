@@ -10,10 +10,16 @@
   <script type="text/javascript">
     (function () {
       const log = console.log
-      const p = Promise.resolve("Joe");
-
       log("Brandon")
-      p.then(() => log("Donny"))
+
+      queueMicrotask(() => log("MIGA"))
+      Promise.resolve().then(() => log("Donny"))
+      queueMicrotask(() => log("Joe"))
+      
+      new MutationObserver(() => {
+        log("boomer")
+      }).observe(document.body, { childList: true, subtree: true })
+
       log("Kushner")
     })();
   </script>

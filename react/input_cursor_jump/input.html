@@ -12,41 +12,58 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
+    (function () {
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
 
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
+      function getInp() {
+        return document.getElementById('inp')
+      }
 
-    let appState = { name: "Brandon" };
+      let appState = { name: "Joe" };
 
-    function updateState(newState) {
-      appState = newState;
-      requestAnimationFrame(render);
-    }
+      function updateState(newState) {
+        console.log(getInp().selectionStart)
+        appState = newState;
 
-    function render() {
-      root.render(<MyApp name={appState.name} />);
-    }
+        queueMicrotask(() => {
+          console.log("microtask: ", getInp().selectionStart)
+        });
 
-    function MyApp(props) {
+        requestAnimationFrame(() => {
+          console.log("aF: ", getInp().selectionStart)
+          getInp().setSelectionRange(1, 1);
+          console.log("aF: ", getInp().selectionStart)
+          render()
+        });
+      }
 
-      React.useEffect(() => {
-        console.log('mounted');
+      function render() {
+        root.render(<MyApp name={appState.name} />);
+      }
 
-        return () => {
-          console.log('unmounted')
-        }
-      }, []);
+      function MyApp(props) {
 
-      return (<div>
-        <label>Name</label>
-        <input value={props.name}
-          onChange={(evt) => {
-            updateState({ ...appState, name: evt.target.value })
-          }} />
-      </div>);
-    }
+        React.useEffect(() => {
+          console.log('mounted');
 
-    render();
+          return () => {
+            console.log('unmounted')
+          }
+        }, []);
+
+        return (<div>
+          <label>Name</label>
+          <input id="inp"
+            value={props.name}
+            onChange={(evt) => {
+              updateState({ ...appState, name: evt.target.value })
+            }} />
+        </div>);
+      }
+
+      render();
+    })();
 
   </script>
 </body>

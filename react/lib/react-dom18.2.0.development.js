@@ -1821,6 +1821,7 @@
           node.value = toString(value);
         }
       } else if (node.value !== toString(value)) {
+        // XXX alert(node.value)
         node.value = toString(value);
       }
     } else if (type === 'submit' || type === 'reset') {
