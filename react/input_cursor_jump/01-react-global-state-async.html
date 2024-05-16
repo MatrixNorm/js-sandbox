@@ -23,17 +23,19 @@
       let appState = { name: "Joe" };
 
       function updateState(newState) {
-        console.log(getInp().selectionStart)
+        const input = getInp();
+        console.log(input.value, input.selectionStart)
+        alert("So far caret is in right position.")
         appState = newState;
 
         queueMicrotask(() => {
-          console.log("microtask: ", getInp().selectionStart)
+          console.log("microtask: ", input.selectionStart)
+          alert("Already in microtask input's caret position is set to the end")
         });
 
         requestAnimationFrame(() => {
-          console.log("aF: ", getInp().selectionStart)
-          getInp().setSelectionRange(1, 1);
-          console.log("aF: ", getInp().selectionStart)
+          console.log("aF: ", input.selectionStart)
+          alert("Donny")
           render()
         });
       }
@@ -53,7 +55,7 @@
         }, []);
 
         return (<div>
-          <label>Name</label>
+          <p>{props.name.toUpperCase()}</p>
           <input id="inp"
             value={props.name}
             onChange={(evt) => {

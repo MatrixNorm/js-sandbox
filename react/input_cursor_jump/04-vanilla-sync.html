@@ -14,9 +14,12 @@
     const inputEl = document.getElementById('input');
 
     inputEl.addEventListener("input", (evt) => {
-      const val = evt.target.value;
+      console.log(evt.target.value, evt.target.selectionStart)
+      alert("Joe")
+
       requestAnimationFrame(() => {
-        inputEl.value = val.toUpperCase();
+        console.log(evt.target.value, evt.target.selectionStart)
+        alert("Brandon")
       })
     })
 
