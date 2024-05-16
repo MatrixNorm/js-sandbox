@@ -10,6 +10,7 @@
 </head>
 
 <body>
+  <a href="./">return</a>
   <div id="root"></div>
   <script type="text/babel">
     (function () {
@@ -25,7 +26,7 @@
       function updateState(newState) {
         const input = getInp();
         console.log(input.value, input.selectionStart)
-        alert("So far caret is in right position.")
+        //alert("So far caret is in right position.")
         appState = newState;
 
         queueMicrotask(() => {
@@ -35,7 +36,7 @@
 
         requestAnimationFrame(() => {
           console.log("aF: ", input.selectionStart)
-          alert("Donny")
+          //alert("Donny")
           render()
         });
       }
@@ -55,7 +56,6 @@
         }, []);
 
         return (<div>
-          <p>{props.name.toUpperCase()}</p>
           <input id="inp"
             value={props.name}
             onChange={(evt) => {

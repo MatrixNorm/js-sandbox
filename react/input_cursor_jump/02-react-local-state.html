@@ -13,31 +13,43 @@
   <div id="root"></div>
   <script type="text/babel">
 
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
+    // function flushSyncCallbacks() !!!
+    // отличие от 01-
 
-    function MyApp(props) {
+    (function () {
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
 
-      const [name, setName] = React.useState("Brandon");
+      function MyApp(props) {
 
-      React.useEffect(() => {
-        console.log('mounted');
+        const [name, setName] = React.useState("Brandon");
 
-        return () => {
-          console.log('unmounted')
-        }
-      }, []);
+        React.useEffect(() => {
+          console.log('mounted');
 
-      return (<div>
-        <label>Name</label>
-        <input value={name}
-          onChange={(evt) => {
-            setName(evt.target.value)
-          }} />
-      </div>);
-    }
+          return () => {
+            console.log('unmounted')
+          }
+        }, []);
 
-    root.render(<MyApp />);
+        return (<div>
+          <label>Name</label>
+          <input value={name}
+            onChange={(evt) => {
+
+              queueMicrotask(() => {
+                alert("xyz")
+              });
+
+              setName(evt.target.value)
+            }} />
+        </div>);
+      }
+
+      root.render(<MyApp />);
+    })();
+
+
 
   </script>
 </body>
