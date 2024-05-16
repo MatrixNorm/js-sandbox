@@ -1821,7 +1821,10 @@
           node.value = toString(value);
         }
       } else if (node.value !== toString(value)) {
+        console.log({value: node.value, caret: node.selectionStart, newValue: value})
+        alert("caret jumps here")
         node.value = toString(value);
+        console.log({value: node.value, caret: node.selectionStart})
       }
     } else if (type === 'submit' || type === 'reset') {
       // Submit/reset inputs need the attribute removed completely to avoid

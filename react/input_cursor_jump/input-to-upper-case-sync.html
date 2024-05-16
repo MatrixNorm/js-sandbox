@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello World</title>
+</head>
+
+<body>
+  <div>
+    <p>without setSelectionRange</p>
+    <input id="input1" />
+  </div>
+  <div>
+    <p>with setSelectionRange</p>
+    <input id="input2" />
+  </div>
+  <script type="text/javascript">
+    (function () {
+      const inputEl = document.getElementById('input1');
+
+      inputEl.addEventListener("input", (evt) => {
+        console.log(evt.target === inputEl)
+        console.log("Donny", evt.target.value, evt.target.selectionStart)
+
+        alert("DOM is updated with user input, changes are not painted yet")
+        // alert реально блокирует поток страницы
+        // и не даёт браузеру рисовать.
+        // Это в отличии от брейкпоинта в девтулз.
+
+        const val = evt.target.value;
+        evt.target.value = val.toUpperCase();
+        // Изменяем ДОМ: новое значение для поля ввода.
+
+        console.log("Kushner", evt.target.value, evt.target.selectionStart)
+        alert(
+          "DOM is updated by JS, changes are not painted yet.\n" +
+          "Notice that caret position is set to the end of input string.")
+
+        requestAnimationFrame(() => {
+          console.log("Joe", evt.target.value, evt.target.selectionStart)
+          alert("Hello from first animation frame, changes are not painted yet")
+
+          requestAnimationFrame(() => {
+            console.log("Brandon", evt.target.value, evt.target.selectionStart)
+            alert("Hello from second animation frame. Finally changes are painted.")
+          })
+        })
+      });
+    })();
+
+    (function () {
+      const inputEl = document.getElementById('input2');
+
+      inputEl.addEventListener("input", (evt) => {
+        const caretPositionBefore = evt.target.selectionStart;
+        const val = evt.target.value;
+        evt.target.value = val.toUpperCase();
+        evt.target.setSelectionRange(caretPositionBefore, caretPositionBefore);
+      });
+    })();
+  </script>
+</body>
+
+</html>
