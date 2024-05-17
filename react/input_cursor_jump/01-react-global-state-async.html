@@ -13,6 +13,11 @@
   <a href="./">return</a>
   <div id="root"></div>
   <script type="text/babel">
+    // function flushSyncCallbacks() в react-dom !!!
+    // syncQueue == null, поэтому perform(Sync|Concurrent)WorkOnRoot
+    // не вызывается. Далее input.value возвращается в состояние до
+    // ввода пользака, как-будто ничего не произошло. Этот возврат
+    // и переставляет курсор в конец поля ввода.
     (function () {
       const container = document.getElementById('root');
       const root = ReactDOM.createRoot(container);
@@ -59,6 +64,7 @@
           <input id="inp"
             value={props.name}
             onChange={(evt) => {
+              // comment out next line and type into input
               updateState({ ...appState, name: evt.target.value })
             }} />
         </div>);

@@ -10,11 +10,12 @@
 </head>
 
 <body>
+  <a href="./">return</a>
   <div id="root"></div>
   <script type="text/babel">
 
     // function flushSyncCallbacks() !!!
-    // отличие от 01-
+    // syncQueue != null, поэтому вызывается performSyncWorkOnRoot
 
     (function () {
       const container = document.getElementById('root');
@@ -33,7 +34,6 @@
         }, []);
 
         return (<div>
-          <label>Name</label>
           <input value={name}
             onChange={(evt) => {
 
