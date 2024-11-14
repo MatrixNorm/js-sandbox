@@ -55,12 +55,64 @@
     );
   }
 
+  function toDigraphDAG(oldTree, newTree) {
+    const knownNodes = new WeakMap();
+    let currId = 0;
+
+    let nodesDeclaration = [];
+    let nodesConnections = [];
+
+    function recur (node, father) {
+      if (knownNodes.has(node)) {
+        nodesConnections.push(
+          [knownNodes.get(father),
+           knownNodes.get(node)]
+        );
+        return;
+      }
+      knownNodes.set(node, ++currId);
+
+      let [val, left, right] = node;
+
+      nodesDeclaration.push([knownNodes.get(node), val]);
+      if (father !== null) {
+        nodesConnections.push(
+          [knownNodes.get(father),
+           knownNodes.get(node)]
+        );
+      }
+
+      if (left !== null) {
+        recur(left, node);
+      }
+      if (right !== null) {
+        recur(right, node);
+      }
+    }
+
+    recur(oldTree, null);
+    recur(newTree, null);
+    return (
+      ''
+      + 'digraph {\n'
+      + 'node [shape = circle, ordering=out];\n'
+      + nodesDeclaration.map(([id, label]) =>
+        `${id} [label="${label}"];`
+      ).join('\n')
+      + '\n'
+      + nodesConnections.map(([source, target]) =>
+        `${source} -> ${target};`
+      ).join('\n')
+      + '\n}'
+    );
+  }
+
   const tree2 = insertRecur(tree, 19);
 
-  console.log(toDigraph(tree));
+  console.log(toDigraphDAG(tree, tree2));
 
   Viz.instance().then(function(viz) {
-    document.body.appendChild(viz.renderSVGElement(toDigraph(tree)));
+    document.body.appendChild(viz.renderSVGElement(toDigraphDAG(tree, tree2)));
   });  
   
 })();
