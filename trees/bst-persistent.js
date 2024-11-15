@@ -18,7 +18,7 @@
         ,[10, null, null]
       ]
       ,[16
-        ,null
+        ,[14, null, null]
         ,[20
             ,[18, null, null]
             ,[22, null, null]]
@@ -58,15 +58,22 @@
   function toDigraphDAG(oldTree, newTree) {
     const knownNodes = new WeakMap();
     let currId = 0;
+    const nodesDeclaration = [];
+    const nodesConnections = [];
 
-    let nodesDeclaration = [];
-    let nodesConnections = [];
+    function recur (node, father, options) {
+      // node != null
+      // node = [val, left, right]
+      options = options || {};
 
-    function recur (node, father) {
       if (knownNodes.has(node)) {
+        // узел уже посещался ранее
+        // добавляем дугу к этому узлу от его отца
+        // и закругляемся
         nodesConnections.push(
           [knownNodes.get(father),
-           knownNodes.get(node)]
+           knownNodes.get(node),
+          {color: options.edgeColor}]
         );
         return;
       }
@@ -74,35 +81,47 @@
 
       let [val, left, right] = node;
 
-      nodesDeclaration.push([knownNodes.get(node), val]);
+      nodesDeclaration.push(
+        [knownNodes.get(node),
+         val,
+         {color: options.nodeColor}]
+      );
       if (father !== null) {
         nodesConnections.push(
           [knownNodes.get(father),
-           knownNodes.get(node)]
+           knownNodes.get(node),
+           {color: options.edgeColor}]
         );
       }
 
       if (left !== null) {
-        recur(left, node);
+        recur(left, node, options);
       }
       if (right !== null) {
-        recur(right, node);
+        recur(right, node, options);
       }
     }
 
+    // populates nodesDeclaration and nodesConnections
     recur(oldTree, null);
-    recur(newTree, null);
+    recur(newTree, null, {nodeColor: "red", edgeColor: "red"});
+
     return (
       ''
       + 'digraph {\n'
       + 'node [shape = circle, ordering=out];\n'
-      + nodesDeclaration.map(([id, label]) =>
-        `${id} [label="${label}"];`
-      ).join('\n')
+      + nodesDeclaration.map(([id, val, options]) => {
+        let opts = ''
+          + `label="${val}"`
+          + (options.color ? `, color="${options.color}"` : '');
+        return `${id} [${opts}];`;
+      }).join('\n')
       + '\n'
-      + nodesConnections.map(([source, target]) =>
-        `${source} -> ${target};`
-      ).join('\n')
+      + nodesConnections.map(([source, target, options]) => {
+          let opts = ''
+            + (options.color ? `color="${options.color}"` : '');
+          return `${source} -> ${target} [${opts}];`;
+        }).join('\n')
       + '\n}'
     );
   }
