@@ -1,4 +1,10 @@
-import {insertRecur, toDigraph, toDigraphDAG} from "./bst.js"
+import {
+  insertRecur,
+  insertIterative,
+  compareTreesRecur} from "./bst.js";
+import {
+  toDigraph,
+  toDigraphDAG} from "./graphviz.js"
 
 const tree = 
   [12
@@ -14,18 +20,26 @@ const tree =
     ]
   ];
 
+
+const tRecur = insertRecur(tree, 19);  
+const tIter = insertIterative(tree, 19);
+
+console.log(
+  JSON.stringify(tRecur) === 
+  JSON.stringify(tIter)
+)
+
 const tree2 = insertRecur(tree, 19);
 
-console.log(toDigraphDAG(tree, tree2));
-
 Viz.instance().then(function(viz) {
-  document.getElementById("bear").appendChild(
-    viz.renderSVGElement(toDigraphDAG(tree, tree2))
-  );
+  // document.getElementById("bear").appendChild(
+  //   viz.renderSVGElement(toDigraphDAG(tree, tree2))
+  // );
   document.getElementById("cat").appendChild(
     viz.renderSVGElement(toDigraph(tree))
   );
-  document.getElementById("belka").appendChild(
-    viz.renderSVGElement(toDigraph(tree2))
-  );
+  // document.getElementById("belka").appendChild(
+  //   viz.renderSVGElement(toDigraph(tree2))
+  // );
+  console.log(toDigraph(tree));
 }); 
