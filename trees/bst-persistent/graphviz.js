@@ -1,76 +1,117 @@
-export function toDigraph(tree) {
-  function recur (tree, mutableState, fatherId) {
-    const [val, left, right] = tree;
 
-    mutableState.currentId++;
-    mutableState.nodesDeclarations.push(
-      [mutableState.currentId, val]
-    );
-    if (fatherId) {
-      mutableState.nodesConnections.push(
-        [fatherId, mutableState.currentId]
-      )
-    }
-
-    fatherId = mutableState.currentId;
-
-    if (left !== null) {
-      recur(left, mutableState, fatherId);
-    }
-      
-    if (right !== null) {
-      recur(right, mutableState, fatherId);
-    }
-  }
-
-  if (tree === null) {
-    return '';
-  }
-  
-  let mutableState = {
-    nodesDeclarations: [],
-    nodesConnections: [],
-    currentId: 0};
-  
-  recur(tree, mutableState);
-
+function __print({nodesDeclarations, nodesConnections}) {
   return (
     ''
     + 'digraph {\n'
     + 'node [shape = circle, ordering=out];\n'
-    + mutableState.nodesDeclarations.map(([id, val]) => {
+    + nodesDeclarations.map(([id, val]) => {
       let opts = `label="${val}"`;
       return `${id} [${opts}];`;
     }).join('\n')
     + '\n'
-    + mutableState.nodesConnections.map(([source, target]) => {
+    + nodesConnections.map(([source, target]) => {
         return `${source} -> ${target};`;
       }).join('\n')
     + '\n}'
   );
 }
 
-export function toDigraphVersion2(tree) {
-  function recur (tree, state) {
-    const [val, left, right] = tree;
-    const {fatherId} = state;
+export function toDigraph_v1Closure(tree) {
+
+  const nodes = []; // [nodeId, nodeValue]
+  const connections = []; // [sourceNodeId, targetNodeId]
+  let currentId = 0;
+
+  function recurPreOrder(node, fatherId) {
+    // pre: node != null
+    const [val, left, right] = node;
+    // entering node
+    currentId++;
+    nodes.push([currentId, val]);
+    if (fatherId) {
+      connections.push([fatherId, currentId])
+    }
+
+    fatherId = currentId;
+
+    if (left !== null) {
+      recurPreOrder(left, fatherId);
+    }      
+    if (right !== null) {
+      recurPreOrder(right, fatherId);
+    }
+  }
+
+  if (tree === null) {
+    return '';
+  }
+  recurPreOrder(tree);
+
+  return __print({
+    nodesDeclarations: nodes,
+    nodesConnections: connections
+  });
+}
+
+export function toDigraph_v1Closure_explicitStack(tree) {
+
+  const nodes = []; // [nodeId, nodeValue]
+  const connections = []; // [sourceNodeId, targetNodeId]
+  let currentId = 0;
+  let stack = [];
+
+  function recurPreOrder(node, fatherId) {
+    // pre: node != null
+    const [val, left, right] = node;
+    // entering node
+    currentId++;
+    nodes.push([currentId, val]);
+    if (stack.length > 0) {
+      connections.push([stack[stack.length - 1], currentId])
+    }
+    stack.push(currentId);
+
+    if (left !== null) {
+      recurPreOrder(left);
+    }      
+    if (right !== null) {
+      recurPreOrder(right);
+    }
+    stack.pop();
+  }
+
+  if (tree === null) {
+    return '';
+  }
+  recurPreOrder(tree);
+
+  return __print({
+    nodesDeclarations: nodes,
+    nodesConnections: connections
+  });
+}
+
+export function toDigraph_v2MutableState(tree) {
+
+  function recurPreOrder(node, state, fatherId) {
+    const [val, left, right] = node;
 
     state.currentId++;
-    state.nodesDeclarations.push([state.currentId, val]);
+    state.nodes.push([state.currentId, val]);
     if (fatherId) {
-      state.nodesConnections.push(
+      state.connections.push(
         [fatherId, state.currentId]
       )
     }
 
-    fatherId = mutableState.currentId;
+    fatherId = state.currentId;
 
     if (left !== null) {
-      recur(left, {...state, fatherId});
+      recurPreOrder(left, state, fatherId);
     }
       
     if (right !== null) {
-      recur(right, {...state, fatherId});
+      recurPreOrder(right, state, fatherId);
     }
   }
 
@@ -78,24 +119,83 @@ export function toDigraphVersion2(tree) {
     return '';
   }
   
-  let state = recur(tree, { nodesDeclarations: [],
-                            nodesConnections: [],
-                            currentId: 0 });
+  let mutState = {
+    nodes: [],
+    connections: [],
+    currentId: 0
+  };
+  
+  recurPreOrder(tree, mutState);
 
-  return (
-    ''
-    + 'digraph {\n'
-    + 'node [shape = circle, ordering=out];\n'
-    + state.nodesDeclarations.map(([id, val]) => {
-      let opts = `label="${val}"`;
-      return `${id} [${opts}];`;
-    }).join('\n')
-    + '\n'
-    + state.nodesConnections.map(([source, target]) => {
-        return `${source} -> ${target};`;
-      }).join('\n')
-    + '\n}'
-  );
+  return __print({
+    nodesDeclarations: mutState.nodes,
+    nodesConnections: mutState.connections
+  });
+}
+
+export function toDigraph_v2MutableStateExplicitStack(tree) {
+
+  function recurPreOrder(node, state) {
+    const [val, left, right] = node;
+
+    state.currentId++;
+    state.nodes.push([state.currentId, val]);
+    if (state.stack.length > 0) {
+      state.connections.push(
+        [state.stack[state.stack.length - 1], state.currentId]
+      )
+    }
+    state.stack.push(state.currentId);
+
+    if (left !== null) {
+      recurPreOrder(left, state);
+    }
+      
+    if (right !== null) {
+      recurPreOrder(right, state);
+    }
+    state.stack.pop();
+  }
+
+  if (tree === null) {
+    return '';
+  }
+  
+  let mutState = {
+    nodes: [],
+    connections: [],
+    currentId: 0,
+    stack: []
+  };
+  
+  recurPreOrder(tree, mutState);
+
+  return __print({
+    nodesDeclarations: mutState.nodes,
+    nodesConnections: mutState.connections
+  });
+}
+
+export function toDigraphIterative(tree) {
+  if (tree === null) {
+    return '';
+  }
+  
+  let state = {
+    nodes: [1, tree[0]],
+    connections: [],
+    currentId: 1,
+    stack: [1]
+  };
+
+  while (stack.length > 0) {
+    
+  }
+
+  return __print({
+    nodesDeclarations: state.nodes,
+    nodesConnections: state.connections
+  });
 }
 
 export function toDigraphDAG(oldTree, newTree) {

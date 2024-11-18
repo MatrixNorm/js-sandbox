@@ -3,7 +3,10 @@ import {
   insertIterative,
   compareTreesRecur} from "./bst.js";
 import {
-  toDigraph,
+  toDigraph_v1Closure,
+  toDigraph_v1Closure_explicitStack,
+  toDigraph_v2MutableState,
+  toDigraph_v2MutableStateExplicitStack,
   toDigraphDAG} from "./graphviz.js"
 
 const tree = 
@@ -35,11 +38,23 @@ Viz.instance().then(function(viz) {
   // document.getElementById("bear").appendChild(
   //   viz.renderSVGElement(toDigraphDAG(tree, tree2))
   // );
-  document.getElementById("cat").appendChild(
-    viz.renderSVGElement(toDigraph(tree))
+  document.getElementById("fig1").appendChild(
+    viz.renderSVGElement(toDigraph_v1Closure(tree))
   );
-  // document.getElementById("belka").appendChild(
-  //   viz.renderSVGElement(toDigraph(tree2))
-  // );
-  console.log(toDigraph(tree));
+  document.getElementById("fig2").appendChild(
+    viz.renderSVGElement(toDigraph_v2MutableState(tree))
+  );
 }); 
+
+{
+  const v1 = toDigraph_v1Closure(tree);
+  const v1_explicitStack = toDigraph_v1Closure_explicitStack(tree);
+  const v2 = toDigraph_v2MutableState(tree);
+  const v2_explicitStack = toDigraph_v2MutableStateExplicitStack(tree);
+
+  console.log(v1);
+  console.log(v1 === v1_explicitStack);
+  console.log(v1 === v2);
+  console.log(v1 === v2_explicitStack);
+
+}
