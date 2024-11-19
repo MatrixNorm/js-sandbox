@@ -181,20 +181,44 @@ export function toDigraphIterative(tree) {
     return '';
   }
   
-  let state = {
-    nodes: [1, tree[0]],
-    connections: [],
-    currentId: 1,
-    stack: [1]
-  };
+  let nodes = [];
+  let connections = [];
+  let currentId = 0;
+  let stack = [[tree, "entering", null]];
 
   while (stack.length > 0) {
-    
+    let [node, visitorState, nodeId] = stack.pop();
+    let [val, left, right] = node;
+    switch (visitorState) {
+      case "entering":
+        currentId++;
+        nodes.push([currentId, val]);
+        if (stack.length > 0) {
+          connections.push([stack[stack.length - 1][2], currentId]);
+        }
+        if (left) {
+          stack.push([node, "after_left_son", currentId]);
+          stack.push([left, "entering", null]);
+        } else if (right) {
+          stack.push([node, "after_right_son", currentId]);
+          stack.push([right, "entering", null]);
+        }
+        break;
+      case "after_left_son":
+        if (right) {
+          stack.push([node, "after_right_son", nodeId]);
+          stack.push([right, "entering", null]);
+        }
+        break;
+      case "after_right_son":
+        break;
+      default:
+        throw new Error("Should never happen");
+    }
   }
-
   return __print({
-    nodesDeclarations: state.nodes,
-    nodesConnections: state.connections
+    nodesDeclarations: nodes,
+    nodesConnections: connections
   });
 }
 

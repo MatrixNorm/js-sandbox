@@ -7,19 +7,27 @@ import {
   toDigraph_v1Closure_explicitStack,
   toDigraph_v2MutableState,
   toDigraph_v2MutableStateExplicitStack,
+  toDigraphIterative,
   toDigraphDAG} from "./graphviz.js"
+
+
+function leaf(val) {
+  return [val, null, null];
+}
 
 const tree = 
   [12
     ,[9
-      ,[7, null, null]
-      ,[10, null, null]
+      ,leaf(7)
+      ,leaf(10)
     ]
     ,[16
-      ,[14, null, null]
+      ,leaf(14)
       ,[20
-          ,[18, [17, null, null], null]
-          ,[22, null, null]]
+          ,[18
+            ,leaf(17)
+            ,null]
+          ,leaf(22)]
     ]
   ];
 
@@ -51,10 +59,11 @@ Viz.instance().then(function(viz) {
   const v1_explicitStack = toDigraph_v1Closure_explicitStack(tree);
   const v2 = toDigraph_v2MutableState(tree);
   const v2_explicitStack = toDigraph_v2MutableStateExplicitStack(tree);
+  const iterative = toDigraphIterative(tree);
 
-  console.log(v1);
+  console.log(iterative);
   console.log(v1 === v1_explicitStack);
   console.log(v1 === v2);
   console.log(v1 === v2_explicitStack);
-
+  console.log(v1 === iterative);
 }
