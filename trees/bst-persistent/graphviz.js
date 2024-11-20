@@ -176,7 +176,7 @@ export function toDigraph_v2MutableStateExplicitStack(tree) {
   });
 }
 
-export function toDigraphIterative(tree) {
+export function toDigraphIterative_v1(tree) {
   if (tree === null) {
     return '';
   }
@@ -214,6 +214,115 @@ export function toDigraphIterative(tree) {
         break;
       default:
         throw new Error("Should never happen");
+    }
+  }
+  return __print({
+    nodesDeclarations: nodes,
+    nodesConnections: connections
+  });
+}
+
+export function toDigraphIterative_v2(tree) {
+  if (tree === null) {
+    return '';
+  }
+  
+  let nodes = [];
+  let connections = [];
+  let currentId = 0;
+  let stack = [[tree, "entering", null]];
+
+  while (stack.length > 0) {
+    let [node, visitorState, nodeId] = stack.pop();
+    let [val, left, right] = node;
+    switch (visitorState) {
+      case "entering":
+        currentId++;
+        nodes.push([currentId, val]);
+        if (stack.length > 0) {
+          connections.push([stack[stack.length - 1][2], currentId]);
+        }
+        if (right) {
+          stack.push([node, "after_right_son", currentId]);
+          stack.push([right, "entering", null]);
+        }
+        if (left) {
+          stack.push([node, "after_left_son", currentId]);
+          stack.push([left, "entering", null]);
+        }
+        break;
+      case "after_left_son":
+      case "after_right_son":
+        break;
+      default:
+        throw new Error("Should never happen");
+    }
+  }
+  return __print({
+    nodesDeclarations: nodes,
+    nodesConnections: connections
+  });
+}
+
+export function toDigraphIterative_v3(tree) {
+  if (tree === null) {
+    return '';
+  }
+  
+  let nodes = [];
+  let connections = [];
+  let currentId = 0;
+  let stack = [{node: tree, nodeId: null, entering: true}];
+
+  while (stack.length > 0) {
+    let {node, nodeId, entering} = stack.pop();
+    let [val, left, right] = node;
+    if (entering) {
+      currentId++;
+      nodes.push([currentId, val]);
+      if (stack.length > 0) {
+        connections.push(
+          [stack[stack.length - 1]["nodeId"], currentId]);
+      }
+      if (right) {
+        stack.push({node, nodeId: currentId});
+        stack.push({node: right, entering: true});
+      }
+      if (left) {
+        stack.push({node, nodeId: currentId});
+        stack.push({node: left, entering: true});
+      }
+    }
+  }
+  return __print({
+    nodesDeclarations: nodes,
+    nodesConnections: connections
+  });
+}
+
+export function toDigraphIterative_v4(tree) {
+  if (tree === null) {
+    return '';
+  }
+  
+  let nodes = [];
+  let connections = [];
+  let currentId = 0;
+  let stack = [{node: tree, fatherId: null}];
+
+  while (stack.length > 0) {
+    let {node, fatherId} = stack.pop();
+    let [val, left, right] = node;
+    currentId++;
+    nodes.push([currentId, val]);
+    if (fatherId) {
+      connections.push([fatherId, currentId]);
+    }
+    if (right) {
+      stack.push({node: right, fatherId: currentId});
+    }
+    if (left) {
+      stack.push({node: left, fatherId: currentId});
     }
   }
   return __print({
