@@ -31,20 +31,24 @@ export function toDigraph_v1Closure(tree) {
     if (fatherId) {
       connections.push([fatherId, currentId])
     }
+    // запоминаем айди текущего узла, чтобы, когда исполнение
+    // вылезет из (*), можно было передать в (**) айди
+    // правильного отца, т.к. к тому времени currentId
+    // убежит вперёд
+    let thisNodeId = currentId;
 
-    fatherId = currentId;
-
-    if (left !== null) {
-      recurPreOrder(left, fatherId);
+    if (left) {
+      recurPreOrder(left, thisNodeId); // (*)
     }      
-    if (right !== null) {
-      recurPreOrder(right, fatherId);
+    if (right) {
+      recurPreOrder(right, thisNodeId); // (**)
     }
   }
 
   if (tree === null) {
     return '';
   }
+  // tree != null
   recurPreOrder(tree);
 
   return __print({
@@ -58,6 +62,7 @@ export function toDigraph_v1Closure_explicitStack(tree) {
   const nodes = []; // [nodeId, nodeValue]
   const connections = []; // [sourceNodeId, targetNodeId]
   let currentId = 0;
+  // keeping fatherId in explicit stack
   let stack = [];
 
   function recurPreOrder(node, fatherId) {
@@ -67,7 +72,7 @@ export function toDigraph_v1Closure_explicitStack(tree) {
     currentId++;
     nodes.push([currentId, val]);
     if (stack.length > 0) {
-      connections.push([stack[stack.length - 1], currentId])
+      connections.push([stack.at(-1), currentId])
     }
     stack.push(currentId);
 
@@ -83,6 +88,7 @@ export function toDigraph_v1Closure_explicitStack(tree) {
   if (tree === null) {
     return '';
   }
+  // tree != null
   recurPreOrder(tree);
 
   return __print({
@@ -98,20 +104,19 @@ export function toDigraph_v2MutableState(tree) {
 
     state.currentId++;
     state.nodes.push([state.currentId, val]);
+
     if (fatherId) {
-      state.connections.push(
-        [fatherId, state.currentId]
-      )
+      state.connections.push([fatherId, state.currentId])
     }
 
-    fatherId = state.currentId;
+    let thisNodeId = state.currentId;
 
     if (left !== null) {
-      recurPreOrder(left, state, fatherId);
+      recurPreOrder(left, state, thisNodeId);
     }
       
     if (right !== null) {
-      recurPreOrder(right, state, fatherId);
+      recurPreOrder(right, state, thisNodeId);
     }
   }
 
@@ -140,9 +145,10 @@ export function toDigraph_v2MutableStateExplicitStack(tree) {
 
     state.currentId++;
     state.nodes.push([state.currentId, val]);
+
     if (state.stack.length > 0) {
       state.connections.push(
-        [state.stack[state.stack.length - 1], state.currentId]
+        [state.stack.at(-1), state.currentId]
       )
     }
     state.stack.push(state.currentId);
@@ -335,11 +341,11 @@ export function toDigraphDAG(oldTree, newTree) {
   const knownNodes = new WeakMap();
   let currId = 0;
   // array of [id, value, options]
-  const nodesDeclaration = [];
+  const nodes = [];
   // array of [sourceId, targetId, edgeOptions]
-  const nodesConnections = [];
+  const connections = [];
 
-  function recur (node, father, options) {
+  function recur(node, father, options) {
     // предусловия:
     // node != null
     // node = [val, left, right]
@@ -351,7 +357,7 @@ export function toDigraphDAG(oldTree, newTree) {
       // этому узлу от его отца и закругляемся
       // т.к. корень никогда не посещается дважды
       // можно не проверять наличие отца
-      nodesConnections.push(
+      connections.push(
         [knownNodes.get(father),
          knownNodes.get(node),
         {color: options.edgeColor}]
@@ -364,7 +370,7 @@ export function toDigraphDAG(oldTree, newTree) {
 
     let [val, left, right] = node;
 
-    nodesDeclaration.push(
+    nodes.push(
       [knownNodes.get(node),
        val,
        {color: options.nodeColor}]
@@ -372,17 +378,17 @@ export function toDigraphDAG(oldTree, newTree) {
     // если узел не корневой, то добавляем дугу
     // от отца к сыну в БД дуг
     if (father !== null) {
-      nodesConnections.push(
+      connections.push(
         [knownNodes.get(father),
          knownNodes.get(node),
          {color: options.edgeColor}]
       );
     }
 
-    if (left !== null) {
+    if (left) {
       recur(left, node, options);
     }
-    if (right !== null) {
+    if (right) {
       recur(right, node, options);
     }
   }
@@ -395,18 +401,56 @@ export function toDigraphDAG(oldTree, newTree) {
     ''
     + 'digraph {\n'
     + 'node [shape = circle, ordering=out];\n'
-    + nodesDeclaration.map(([id, val, options]) => {
+    + nodes.map(([id, val, options]) => {
       let opts = ''
         + `label="${val}"`
         + (options.color ? `, color="${options.color}"` : '');
       return `${id} [${opts}];`;
     }).join('\n')
     + '\n'
-    + nodesConnections.map(([source, target, options]) => {
+    + connections.map(([source, target, options]) => {
         let opts = ''
           + (options.color ? `color="${options.color}"` : '');
         return `${source} -> ${target} [${opts}];`;
       }).join('\n')
     + '\n}'
   );
+}
+
+export function toDigraph2(tree, visitedNodes) {
+
+  const nodes = []; // [nodeId, nodeValue]
+  const connections = []; // [sourceNodeId, targetNodeId]
+  let currentId = 0;
+
+  function recurPreOrder(node, fatherId) {
+    // pre: node != null
+    const [val, left, right] = node;
+    // entering node
+    currentId++;
+    nodes.push([currentId, val]);
+    if (fatherId) {
+      connections.push([fatherId, currentId])
+    }
+    // запоминаем айди текущего узла, чтобы, когда исполнение
+    // вылезет из (*), можно было передать в (**) айди
+    // правильного отца, т.к. к тому времени currentId
+    // убежит вперёд
+    let thisNodeId = currentId;
+
+    if (left) {
+      recurPreOrder(left, thisNodeId); // (*)
+    }      
+    if (right) {
+      recurPreOrder(right, thisNodeId); // (**)
+    }
+  }
+
+  if (tree === null) {
+    return '';
+  }
+  // tree != null
+  recurPreOrder(tree);
+
+  return {nodes, connections};
 }

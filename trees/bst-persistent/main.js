@@ -17,6 +17,18 @@ import {
 function leaf(val) {
   return [val, null, null];
 }
+/*
+
+        12
+      /    \
+     9      16
+    / \    /  \
+   7  10  14  20
+             /  \
+            18  22
+           /
+         17
+*/
 
 const tree = 
   [12
@@ -43,17 +55,12 @@ console.log(
   JSON.stringify(tIter)
 )
 
-const tree2 = insertRecur(tree, 19);
-
 Viz.instance().then(function(viz) {
-  // document.getElementById("bear").appendChild(
-  //   viz.renderSVGElement(toDigraphDAG(tree, tree2))
-  // );
   document.getElementById("fig1").appendChild(
     viz.renderSVGElement(toDigraph_v1Closure(tree))
   );
   document.getElementById("fig2").appendChild(
-    viz.renderSVGElement(toDigraph_v2MutableState(tree))
+    viz.renderSVGElement(toDigraphDAG(tree, insertRecur(tree, 19)))
   );
 }); 
 
