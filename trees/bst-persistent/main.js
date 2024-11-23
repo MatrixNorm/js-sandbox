@@ -1,7 +1,8 @@
 import {
   insertRecur,
   insertIterative,
-  compareTreesRecur} from "./bst.js";
+  compareTreesRecur
+} from "./bst.js";
 import {
   toDigraph_v1Closure,
   toDigraph_v1Closure_explicitStack,
@@ -11,7 +12,9 @@ import {
   toDigraphIterative_v2,
   toDigraphIterative_v3,
   toDigraphIterative_v4,
-  toDigraphDAG} from "./graphviz.js"
+  toDigraphDAG,
+  toDigraphDAG2
+} from "./graphviz.js"
 
 
 function leaf(val) {
@@ -74,7 +77,7 @@ Viz.instance().then(function(viz) {
   const iter_v3 = toDigraphIterative_v3(tree);
   const iter_v4 = toDigraphIterative_v4(tree);
 
-  console.log(iter_v4);
+  console.log(toDigraphDAG2(tree, insertRecur(tree, 19)));
   console.log(v1 === v1_explicitStack);
   console.log(v1 === v2);
   console.log(v1 === v2_explicitStack);

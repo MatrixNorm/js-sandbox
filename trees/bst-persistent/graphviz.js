@@ -417,40 +417,58 @@ export function toDigraphDAG(oldTree, newTree) {
   );
 }
 
-export function toDigraph2(tree, visitedNodes) {
+export function toDigraph2(tree, history = null) {
+  if (tree === null)
+    return '';
+  if (history?.visitedNodes?.has(tree))
+    return;
+  
+  let nodes = [];
+  let connections = [];
 
-  const nodes = []; // [nodeId, nodeValue]
-  const connections = []; // [sourceNodeId, targetNodeId]
-  let currentId = 0;
+  let currentId = history?.currentId || 0;
+  let visitedNodes = new Map(history?.visitedNodes);
+  
+  let stack = [{node: tree, fatherId: null}];
 
-  function recurPreOrder(node, fatherId) {
-    // pre: node != null
-    const [val, left, right] = node;
-    // entering node
+  while (stack.length > 0) {
+    let {node, fatherId} = stack.pop();
+    let [val, left, right] = node;
+    
     currentId++;
     nodes.push([currentId, val]);
+    visitedNodes.set(node, currentId);
+    
     if (fatherId) {
-      connections.push([fatherId, currentId])
+      connections.push([fatherId, currentId]);
     }
-    // запоминаем айди текущего узла, чтобы, когда исполнение
-    // вылезет из (*), можно было передать в (**) айди
-    // правильного отца, т.к. к тому времени currentId
-    // убежит вперёд
-    let thisNodeId = currentId;
-
-    if (left) {
-      recurPreOrder(left, thisNodeId); // (*)
-    }      
     if (right) {
-      recurPreOrder(right, thisNodeId); // (**)
+      if (visitedNodes.has(right)) {
+        connections.push([currentId, visitedNodes.get(right)]);
+      } else {
+        stack.push({node: right, fatherId: currentId});
+      }
+    }
+    if (left) {
+      if (visitedNodes.has(left)) {
+        connections.push([currentId, visitedNodes.get(left)]);
+      } else {
+        stack.push({node: left, fatherId: currentId});
+      }
     }
   }
 
-  if (tree === null) {
-    return '';
-  }
-  // tree != null
-  recurPreOrder(tree);
+  return {
+    nodes,
+    connections,
+    visitedNodes,
+    currentId,
+  };
+}
 
-  return {nodes, connections};
+export function toDigraphDAG2(oldTree, newTree) {
+  const x1 = toDigraph2(oldTree);
+  console.log(x1);
+  const x2 = toDigraph2(newTree, x1);
+  console.log(x2);
 }
