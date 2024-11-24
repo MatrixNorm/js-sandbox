@@ -12,8 +12,8 @@ import {
   toDigraphIterative_v2,
   toDigraphIterative_v3,
   toDigraphIterative_v4,
-  toDigraphDAG,
-  toDigraphDAG2
+  toDigraphDAG__legacy,
+  toDigraphDAG
 } from "./graphviz.js"
 
 
@@ -65,6 +65,9 @@ Viz.instance().then(function(viz) {
   document.getElementById("fig2").appendChild(
     viz.renderSVGElement(toDigraphDAG(tree, insertRecur(tree, 19)))
   );
+  // document.getElementById("fig2").appendChild(
+  //   viz.renderSVGElement(toDigraphDAG2(tree, insertRecur(tree, 19)))
+  // );
 }); 
 
 {
@@ -77,7 +80,11 @@ Viz.instance().then(function(viz) {
   const iter_v3 = toDigraphIterative_v3(tree);
   const iter_v4 = toDigraphIterative_v4(tree);
 
-  console.log(toDigraphDAG2(tree, insertRecur(tree, 19)));
+  console.log(
+    toDigraphDAG(tree, insertRecur(tree, 19)) ===
+    toDigraphDAG__legacy(tree, insertRecur(tree, 19))
+  );
+
   console.log(v1 === v1_explicitStack);
   console.log(v1 === v2);
   console.log(v1 === v2_explicitStack);

@@ -337,7 +337,7 @@ export function toDigraphIterative_v4(tree) {
   });
 }
 
-export function toDigraphDAG(oldTree, newTree) {
+export function toDigraphDAG__legacy(oldTree, newTree) {
   const knownNodes = new WeakMap();
   let currId = 0;
   // array of [id, value, options]
@@ -425,14 +425,19 @@ export function toDigraph2(tree, history = null) {
   
   let nodes = [];
   let connections = [];
-
   let currentId = history?.currentId || 0;
   let visitedNodes = new Map(history?.visitedNodes);
   
-  let stack = [{node: tree, fatherId: null}];
+  let _stack = [{node: tree, fatherId: null}];
 
-  while (stack.length > 0) {
-    let {node, fatherId} = stack.pop();
+  while (_stack.length > 0) {
+    let {node, fatherId} = _stack.pop();
+
+    if (visitedNodes.has(node)) {
+      connections.push([fatherId, visitedNodes.get(node)]);
+      continue;
+    }
+
     let [val, left, right] = node;
     
     currentId++;
@@ -443,18 +448,10 @@ export function toDigraph2(tree, history = null) {
       connections.push([fatherId, currentId]);
     }
     if (right) {
-      if (visitedNodes.has(right)) {
-        connections.push([currentId, visitedNodes.get(right)]);
-      } else {
-        stack.push({node: right, fatherId: currentId});
-      }
+      _stack.push({node: right, fatherId: currentId});
     }
     if (left) {
-      if (visitedNodes.has(left)) {
-        connections.push([currentId, visitedNodes.get(left)]);
-      } else {
-        stack.push({node: left, fatherId: currentId});
-      }
+      _stack.push({node: left, fatherId: currentId});
     }
   }
 
@@ -466,9 +463,33 @@ export function toDigraph2(tree, history = null) {
   };
 }
 
-export function toDigraphDAG2(oldTree, newTree) {
-  const x1 = toDigraph2(oldTree);
-  console.log(x1);
-  const x2 = toDigraph2(newTree, x1);
-  console.log(x2);
+export function toDigraphDAG(oldTree, newTree) {
+  const oldX = toDigraph2(oldTree);
+  const newX = toDigraph2(newTree, oldX);
+
+  let nodes = oldX.nodes.concat(
+    newX.nodes.map(v => v.concat({color: "red"}))
+  );
+  let connections = oldX.connections.concat(
+    newX.connections.map(v => v.concat({color: "red"}))
+  );
+
+  return (
+    ''
+    + 'digraph {\n'
+    + 'node [shape = circle, ordering=out];\n'
+    + nodes.map(([id, val, options]) => {
+      let opts = ''
+        + `label="${val}"`
+        + (options?.color ? `, color="${options.color}"` : '');
+      return `${id} [${opts}];`;
+    }).join('\n')
+    + '\n'
+    + connections.map(([source, target, options]) => {
+        let opts = ''
+          + (options?.color ? `color="${options.color}"` : '');
+        return `${source} -> ${target} [${opts}];`;
+      }).join('\n')
+    + '\n}'
+  );
 }
