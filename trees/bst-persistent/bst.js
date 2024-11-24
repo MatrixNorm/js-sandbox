@@ -18,27 +18,30 @@ export function insertIterative(tree, val) {
       tree__; // new root
   let [x, left, right] = tree;
 
+  const L = 1;
+  const R = 2;
+
   if (val <= x) {
-    // reuse right subree and go left
+    // new root has the same value as old root; it reuses right
+    // subtree; leave placeholder for left subtree
     tree__ = [x, null, right];
-    curr = left;
-    dir = 'left'; // current node is left son
+    curr = left; // set current node to left son of the root
+    dir = L; // note that current node is left son of the root
   } else {
-    // reuse left subree and go right
+    // new root has the same value as old root; it reuses left
+    // subtree; leave placeholder for right subtree
     tree__ = [x, left, null];
-    curr = right;
-    dir = 'right'; // current node is right son
+    curr = right; // set current node to right son of the root
+    dir = R; // note that current node is right son of the root
   }
 
-  let prev__,  // prev node of new tree
-               // current node is connected to it
-      curr__;  // current node of new tree
-
-  prev__ = tree__;
+  let curr__;  // current node of new tree
+  // upper node of new tree; current node is connected to it
+  let upper__ = tree__;
 
   while (true) {
     if (curr === null) {
-      prev__[dir === 'left' ? 1 : 2] = [val, null, null];
+      upper__[dir] = [val, null, null];
       break;
     }
 
@@ -46,18 +49,18 @@ export function insertIterative(tree, val) {
 
     if (val <= x) {
       curr__ = [x, null, right];
-      prev__[dir === 'left' ? 1 : 2] = curr__;
-
-      prev__ = curr__;
+      upper__[dir] = curr__;
+      // reset for next iteration
+      upper__ = curr__;
       curr = left;
-      dir = 'left';
+      dir = L;
     } else {
       curr__ = [x, left, null];
-      prev__[dir === 'left' ? 1 : 2] = curr__;
-
-      prev__ = curr__;
+      upper__[dir] = curr__;
+      // reset for next iteration
+      upper__ = curr__;
       curr = right;
-      dir = 'right';
+      dir = R;
     }
   }
   return tree__;
